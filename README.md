@@ -1,5 +1,7 @@
 # Musilib Manager
 
+[![CI](https://github.com/SebastienSCochet/Musilib/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SebastienSCochet/Musilib/actions/workflows/ci.yml)
+
 Application de bureau (Windows, .NET 10, Avalonia UI) pour **importer vos playlists YouTube**, les **enrichir avec les métadonnées Spotify**, **exporter localement les fichiers audio que vous possédez** (organisés et taggués) et **transférer votre sélection vers une playlist Spotify**.
 
 ![Import et analyse](docs/screenshots/analyse.png)
