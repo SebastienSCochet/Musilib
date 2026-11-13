@@ -1,0 +1,195 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Musilib.Desktop.ViewModels"
+             xmlns:c="using:Musilib.Desktop.Controls"
+             x:Class="Musilib.Desktop.Views.TrackEditorView"
+             x:DataType="vm:TrackEditorViewModel">
+  <Grid ColumnDefinitions="300,*">
+    <!-- Liste des morceaux -->
+    <Border Classes="card flush" Margin="0,0,16,0">
+      <Grid RowDefinitions="Auto,*">
+        <Panel Margin="12">
+          <TextBox Classes="search" Text="{Binding Search}" Watermark="Rechercher…" />
+          <c:LineIcon Data="{StaticResource Icon.Search}" Classes="small" Foreground="{DynamicResource TextTertiaryBrush}" HorizontalAlignment="Left" Margin="14,0,0,0" IsHitTestVisible="False" />
+        </Panel>
+        <ListBox Grid.Row="1" Classes="rows" ItemsSource="{Binding Tracks}" SelectedItem="{Binding Selected}" Margin="6,0,6,6">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:TrackRowViewModel">
+              <Grid ColumnDefinitions="Auto,*" Margin="0,2">
+                <c:CoverArt Source="{Binding Cover}" FallbackText="{Binding FallbackText}" Width="38" Height="38" CornerRadius="6" Margin="0,0,10,0" DecodeWidth="96" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding Artists}" Classes="small muted" />
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </Border>
+
+    <Panel Grid.Column="1">
+      <Border Classes="card" IsVisible="{Binding HasNoSelection}" VerticalAlignment="Top">
+        <StackPanel Spacing="10" HorizontalAlignment="Center" Margin="0,48">
+          <c:LineIcon Data="{StaticResource Icon.Edit}" Classes="huge" Foreground="{DynamicResource TextTertiaryBrush}" HorizontalAlignment="Center" />
+          <TextBlock Text="Sélectionnez un morceau à éditer" Classes="h3" HorizontalAlignment="Center" />
+        </StackPanel>
+      </Border>
+
+      <ScrollViewer Classes="page" IsVisible="{Binding HasSelection}">
+        <Grid ColumnDefinitions="*,300" Margin="0,0,8,12">
+          <!-- Formulaire -->
+          <Border Classes="card" Margin="0,0,16,0" VerticalAlignment="Top">
+            <StackPanel Spacing="14">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel>
+                  <TextBlock Text="Métadonnées" Classes="h2" />
+                  <TextBlock Text="{Binding OriginText}" Classes="small muted" />
+                </StackPanel>
+                <Border Grid.Column="1" Classes="badge warning" IsVisible="{Binding IsDirty}" VerticalAlignment="Top">
+                  <TextBlock Text="Modifications non enregistrées" />
+                </Border>
+              </Grid>
+
+              <StackPanel>
+                <TextBlock Text="Titre *" Classes="label" />
+                <TextBox Text="{Binding EditTitle}" />
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="Artistes (séparés par des virgules)" Classes="label" />
+                <TextBox Text="{Binding EditArtists}" />
+              </StackPanel>
+              <Grid ColumnDefinitions="*,*">
+                <StackPanel Margin="0,0,8,0">
+                  <TextBlock Text="Album" Classes="label" />
+                  <TextBox Text="{Binding EditAlbum}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                  <TextBlock Text="Artiste(s) de l'album" Classes="label" />
+                  <TextBox Text="{Binding EditAlbumArtists}" />
+                </StackPanel>
+              </Grid>
+              <Grid ColumnDefinitions="*,*,90,90">
+                <StackPanel Margin="0,0,8,0">
+                  <TextBlock Text="Date de sortie" Classes="label" />
+                  <TextBox Text="{Binding EditReleaseDate}" Watermark="AAAA-MM-JJ" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0">
+                  <TextBlock Text="Genre" Classes="label" />
+                  <TextBox Text="{Binding EditGenre}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="8,0">
+                  <TextBlock Text="Piste" Classes="label" />
+                  <TextBox Text="{Binding EditTrackNumber}" />
+                </StackPanel>
+                <StackPanel Grid.Column="3" Margin="8,0,0,0">
+                  <TextBlock Text="Disque" Classes="label" />
+                  <TextBox Text="{Binding EditDiscNumber}" />
+                </StackPanel>
+              </Grid>
+              <Grid ColumnDefinitions="*,2*">
+                <StackPanel Margin="0,0,8,0">
+                  <TextBlock Text="ISRC" Classes="label" />
+                  <TextBox Text="{Binding EditIsrc}" Watermark="FRXXX2400001" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                  <TextBlock Text="URL de la pochette" Classes="label" />
+                  <TextBox Text="{Binding EditCoverUrl}" Watermark="https://…" />
+                </StackPanel>
+              </Grid>
+              <StackPanel>
+                <TextBlock Text="Commentaire" Classes="label" />
+                <TextBox Text="{Binding EditComment}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" />
+              </StackPanel>
+
+              <Border Classes="notice danger" IsVisible="{Binding HasValidationError}">
+                <TextBlock Text="{Binding ValidationError}" Classes="small wrap" />
+              </Border>
+
+              <Border Classes="divider" />
+              <WrapPanel>
+                <Button Classes="primary" Command="{Binding SaveCommand}" Margin="0,0,8,8">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <c:LineIcon Data="{StaticResource Icon.Save}" Classes="small" />
+                    <TextBlock Text="Enregistrer" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="outline" Command="{Binding RevertCommand}" Margin="0,0,8,8">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <c:LineIcon Data="{StaticResource Icon.Undo}" Classes="small" />
+                    <TextBlock Text="Annuler les modifications" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="ghost" Content="Rétablir les données Spotify" Command="{Binding RestoreSpotifyCommand}" IsVisible="{Binding HasSpotify}" Margin="0,0,8,8" />
+                <Button Classes="ghost" Content="Comparer les correspondances" Command="{Binding CompareCommand}" Margin="0,0,8,8" />
+              </WrapPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- Pochette, lecture, fichiers -->
+          <StackPanel Grid.Column="1" Spacing="16">
+            <Border Classes="card" Padding="16">
+              <StackPanel Spacing="12">
+                <c:CoverArt Source="{Binding CoverPreview}" FallbackText="{Binding CoverFallback}" Height="268" CornerRadius="10" DecodeWidth="600" />
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                  <Button Classes="outline small" Command="{Binding ChooseCoverCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <c:LineIcon Data="{StaticResource Icon.Image}" Classes="small" />
+                      <TextBlock Text="Choisir une image" />
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="ghost small" Content="Retirer" Command="{Binding ClearCustomCoverCommand}" ToolTip.Tip="Retirer l'image personnalisée" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card" Padding="16">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Écoute" Classes="h3" />
+                <Button Classes="outline" HorizontalAlignment="Stretch" Command="{Binding PlayPreviewCommand}" IsEnabled="{Binding HasPreview}">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <c:LineIcon Data="{StaticResource Icon.Play}" Classes="small" />
+                    <TextBlock Text="Extrait Spotify" />
+                  </StackPanel>
+                </Button>
+                <TextBlock Text="Spotify ne fournit pas d'extrait pour ce titre." Classes="small subtle wrap" IsVisible="{Binding !HasPreview}" />
+                <Button Classes="outline" HorizontalAlignment="Stretch" Command="{Binding PlayLocalCommand}" IsEnabled="{Binding HasLocalFile}">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <c:LineIcon Data="{StaticResource Icon.Play}" Classes="small" />
+                    <TextBlock Text="Fichier local" />
+                  </StackPanel>
+                </Button>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button Classes="link" Content="Ouvrir dans Spotify ↗" Command="{Binding OpenSpotifyCommand}" IsVisible="{Binding HasSpotify}" />
+                  <Button Classes="link" Content="Voir sur YouTube ↗" Command="{Binding OpenYouTubeCommand}" />
+                </StackPanel>
+                <TextBlock Text="{Binding SpotifyText}" Classes="small muted wrap" />
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card" Padding="16">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Fichier audio local" Classes="h3" />
+                <TextBlock Text="{Binding LocalFile}" Classes="small muted wrap" />
+                <WrapPanel>
+                  <Button Classes="outline small" Content="Associer…" Command="{Binding AssociateFileCommand}" Margin="0,0,6,6" />
+                  <Button Classes="ghost small" Content="Lire les tags" Command="{Binding ImportTagsFromFileCommand}" IsVisible="{Binding HasLocalFile}" Margin="0,0,6,6" />
+                  <Button Classes="ghost small" Content="Dissocier" Command="{Binding RemoveFileCommand}" IsVisible="{Binding HasLocalFile}" Margin="0,0,6,6" />
+                </WrapPanel>
+                <TextBlock Classes="small subtle wrap" Text="Associez uniquement des fichiers que vous possédez. Musilib ne télécharge pas l'audio de YouTube ni de Spotify." />
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card" Padding="16">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Source YouTube" Classes="h3" />
+                <TextBlock Text="{Binding SourceTitle}" Classes="small muted wrap" />
+                <TextBlock Text="{Binding SourceDuration, StringFormat='Durée : {0}'}" Classes="small subtle" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Grid>
+      </ScrollViewer>
+    </Panel>
+  </Grid>
+</UserControl>

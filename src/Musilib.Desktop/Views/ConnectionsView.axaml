@@ -1,0 +1,147 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Musilib.Desktop.ViewModels"
+             xmlns:c="using:Musilib.Desktop.Controls"
+             x:Class="Musilib.Desktop.Views.ConnectionsView"
+             x:DataType="vm:ConnectionsViewModel">
+  <ScrollViewer Classes="page">
+    <StackPanel Spacing="20" Margin="0,0,8,12">
+      <TextBlock Classes="muted wrap" MaxWidth="900" HorizontalAlignment="Left"
+                 Text="Musilib utilise les mécanismes OAuth officiels (Authorization Code + PKCE) avec une redirection locale sur 127.0.0.1. Les jetons sont chiffrés avec votre compte Windows (DPAPI) et renouvelés automatiquement. Seules les permissions minimales sont demandées." />
+
+      <Border Classes="notice" IsVisible="{Binding IsDemo}">
+        <TextBlock Classes="wrap small" Text="Mode démonstration : les connexions sont simulées. Désactivez le mode démo dans les Paramètres pour connecter vos comptes réels." />
+      </Border>
+
+      <Grid ColumnDefinitions="*,*">
+        <!-- ============ YouTube ============ -->
+        <Border Classes="card" Margin="0,0,10,0" Padding="24">
+          <StackPanel Spacing="16">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <Border Classes="chip youtube" Width="48" Height="48" Margin="0,0,14,0">
+                <c:LineIcon Data="{StaticResource Icon.YouTube}" Classes="large" />
+              </Border>
+              <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="YouTube" Classes="h2" />
+                <TextBlock Text="Lecture seule de vos playlists (youtube.readonly)" Classes="small muted" />
+              </StackPanel>
+              <Border Grid.Column="2" Classes="badge" Classes.success="{Binding YouTubeConnected}" VerticalAlignment="Center">
+                <TextBlock Text="{Binding YouTubeStatus}" />
+              </Border>
+            </Grid>
+
+            <StackPanel Spacing="12" IsVisible="{Binding IsNotDemo}">
+              <StackPanel>
+                <TextBlock Text="ID client OAuth (application de bureau)" Classes="label" />
+                <TextBox Text="{Binding YouTubeClientId}" Watermark="xxxxxxxx.apps.googleusercontent.com" />
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="Code secret du client" Classes="label" />
+                <TextBox Text="{Binding YouTubeClientSecret}" PasswordChar="•" Watermark="Laisser vide pour conserver la valeur enregistrée" />
+                <TextBlock Text="✓ Un secret chiffré est enregistré" Classes="small success" Margin="0,4,0,0" IsVisible="{Binding YouTubeHasSecret}" />
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="Clé API (facultative — playlists publiques sans connexion)" Classes="label" />
+                <TextBox Text="{Binding YouTubeApiKey}" PasswordChar="•" Watermark="Laisser vide pour conserver la valeur enregistrée" />
+                <TextBlock Text="✓ Une clé API chiffrée est enregistrée" Classes="small success" Margin="0,4,0,0" IsVisible="{Binding YouTubeHasApiKey}" />
+              </StackPanel>
+              <WrapPanel>
+                <Button Classes="outline" Content="Enregistrer" Command="{Binding SaveYouTubeCommand}" Margin="0,0,8,8" />
+                <Button Classes="ghost" Content="Effacer les secrets" Command="{Binding ClearYouTubeSecretsCommand}" Margin="0,0,8,8" />
+                <Button Classes="link" Content="Console Google Cloud ↗" Command="{Binding OpenGoogleConsoleCommand}" Margin="8,0,0,8" />
+              </WrapPanel>
+            </StackPanel>
+
+            <Border Classes="divider" />
+            <WrapPanel>
+              <Button Classes="primary" Command="{Binding ConnectYouTubeCommand}" IsVisible="{Binding !YouTubeConnected}" IsEnabled="{Binding !YouTubeBusy}" Margin="0,0,8,8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <c:LineIcon Data="{StaticResource Icon.Login}" Classes="small" />
+                  <TextBlock Text="Se connecter avec Google" />
+                </StackPanel>
+              </Button>
+              <Button Classes="ghost" Content="Annuler" Command="{Binding CancelSignInCommand}" IsVisible="{Binding YouTubeBusy}" Margin="0,0,8,8" />
+              <Button Classes="outline" Content="Tester" Command="{Binding TestYouTubeCommand}" Margin="0,0,8,8" />
+              <Button Classes="danger" Command="{Binding DisconnectYouTubeCommand}" IsVisible="{Binding YouTubeConnected}" Margin="0,0,8,8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <c:LineIcon Data="{StaticResource Icon.Logout}" Classes="small" />
+                  <TextBlock Text="Se déconnecter" />
+                </StackPanel>
+              </Button>
+            </WrapPanel>
+
+            <Expander Header="Comment obtenir ces identifiants ?" IsVisible="{Binding IsNotDemo}">
+              <TextBlock Classes="small muted wrap" Text="1. Dans Google Cloud Console, créez un projet et activez « YouTube Data API v3 ».&#x0a;2. Configurez l'écran de consentement OAuth (type Externe) et ajoutez votre compte comme utilisateur test.&#x0a;3. Identifiants → Créer → ID client OAuth → type « Application de bureau ».&#x0a;4. Copiez l'ID client et le code secret ci-dessus. Aucune URI de redirection n'est à déclarer : Musilib utilise une redirection locale (127.0.0.1) sur un port libre.&#x0a;5. Facultatif : créez une clé API (restreinte à YouTube Data API v3) pour importer des playlists publiques sans connexion.&#x0a;Quota : 10 000 unités/jour par défaut ; un import consomme ~2 unités par tranche de 50 vidéos." />
+            </Expander>
+          </StackPanel>
+        </Border>
+
+        <!-- ============ Spotify ============ -->
+        <Border Grid.Column="1" Classes="card" Margin="10,0,0,0" Padding="24">
+          <StackPanel Spacing="16">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <Border Classes="chip accent" Width="48" Height="48" Margin="0,0,14,0">
+                <c:LineIcon Data="{StaticResource Icon.Spotify}" Classes="large" />
+              </Border>
+              <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="Spotify" Classes="h2" />
+                <TextBlock Text="Recherche, lecture et modification de vos playlists" Classes="small muted" />
+              </StackPanel>
+              <Border Grid.Column="2" Classes="badge" Classes.success="{Binding SpotifyConnected}" VerticalAlignment="Center">
+                <TextBlock Text="{Binding SpotifyStatus}" />
+              </Border>
+            </Grid>
+
+            <StackPanel Spacing="12" IsVisible="{Binding IsNotDemo}">
+              <StackPanel>
+                <TextBlock Text="Client ID" Classes="label" />
+                <TextBox Text="{Binding SpotifyClientId}" Watermark="Identifiant de votre application Spotify" />
+              </StackPanel>
+              <Grid ColumnDefinitions="140,*">
+                <StackPanel Margin="0,0,12,0">
+                  <TextBlock Text="Port de redirection" Classes="label" />
+                  <NumericUpDown Value="{Binding SpotifyRedirectPort}" Minimum="1024" Maximum="65535" Increment="1" FormatString="0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                  <TextBlock Text="URI à déclarer dans le Dashboard Spotify" Classes="label" />
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBox Text="{Binding SpotifyRedirectUri, Mode=OneWay}" IsReadOnly="True" />
+                    <Button Grid.Column="1" Classes="icon" Margin="6,0,0,0" Command="{Binding CopyRedirectUriCommand}" ToolTip.Tip="Copier">
+                      <c:LineIcon Data="{StaticResource Icon.Copy}" Classes="small" />
+                    </Button>
+                  </Grid>
+                </StackPanel>
+              </Grid>
+              <WrapPanel>
+                <Button Classes="outline" Content="Enregistrer" Command="{Binding SaveSpotifyCommand}" Margin="0,0,8,8" />
+                <Button Classes="link" Content="Dashboard Spotify ↗" Command="{Binding OpenSpotifyDashboardCommand}" Margin="8,0,0,8" />
+              </WrapPanel>
+            </StackPanel>
+
+            <Border Classes="divider" />
+            <WrapPanel>
+              <Button Classes="primary" Command="{Binding ConnectSpotifyCommand}" IsVisible="{Binding !SpotifyConnected}" IsEnabled="{Binding !SpotifyBusy}" Margin="0,0,8,8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <c:LineIcon Data="{StaticResource Icon.Login}" Classes="small" />
+                  <TextBlock Text="Se connecter à Spotify" />
+                </StackPanel>
+              </Button>
+              <Button Classes="ghost" Content="Annuler" Command="{Binding CancelSignInCommand}" IsVisible="{Binding SpotifyBusy}" Margin="0,0,8,8" />
+              <Button Classes="outline" Content="Tester" Command="{Binding TestSpotifyCommand}" Margin="0,0,8,8" />
+              <Button Classes="danger" Command="{Binding DisconnectSpotifyCommand}" IsVisible="{Binding SpotifyConnected}" Margin="0,0,8,8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <c:LineIcon Data="{StaticResource Icon.Logout}" Classes="small" />
+                  <TextBlock Text="Se déconnecter" />
+                </StackPanel>
+              </Button>
+            </WrapPanel>
+
+            <Expander Header="Comment créer l'application Spotify ?" IsVisible="{Binding IsNotDemo}">
+              <TextBlock Classes="small muted wrap" Text="1. Sur developer.spotify.com/dashboard, créez une application (API : « Web API »).&#x0a;2. Ajoutez l'URI de redirection affichée ci-dessus (http://127.0.0.1:5543/callback par défaut) — « localhost » n'est plus accepté par Spotify.&#x0a;3. Copiez le Client ID ci-dessus. Aucun secret n'est nécessaire (flux PKCE).&#x0a;4. En mode développement, ajoutez votre compte dans « User Management » (5 utilisateurs maximum, compte Premium requis pour le propriétaire depuis 2026). La recherche est alors limitée à 10 résultats par requête.&#x0a;Les extraits audio (preview_url) ne sont fournis par Spotify que pour certains titres et applications." />
+            </Expander>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

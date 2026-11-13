@@ -1,0 +1,27 @@
+# Build
+bin/
+obj/
+artifacts/
+publish/
+*.user
+*.suo
+.vs/
+.idea/
+*.DotSettings.user
+TestResults/
+*.trx
+*.coverage
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Données locales (ne jamais committer de secrets, bases ou jetons)
+*.db
+*.db-wal
+*.db-shm
+settings.json
+!src/**/appsettings.json
+*.bin
+local.key
+logs/

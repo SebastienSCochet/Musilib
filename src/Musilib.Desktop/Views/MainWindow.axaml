@@ -1,0 +1,240 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Musilib.Desktop.ViewModels"
+        xmlns:v="using:Musilib.Desktop.Views"
+        xmlns:c="using:Musilib.Desktop.Controls"
+        xmlns:conv="using:Musilib.Desktop.Converters"
+        xmlns:s="using:Musilib.Desktop.Services"
+        xmlns:d="using:Musilib.Domain.Entities"
+        x:Class="Musilib.Desktop.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Musilib Manager"
+        Icon="/Assets/musilib.ico"
+        Width="1380" Height="880" MinWidth="1080" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="PreferSystemChrome"
+        ExtendClientAreaTitleBarHeightHint="36">
+
+  <Window.DataTemplates>
+    <DataTemplate DataType="vm:DashboardViewModel"><v:DashboardView /></DataTemplate>
+    <DataTemplate DataType="vm:ConnectionsViewModel"><v:ConnectionsView /></DataTemplate>
+    <DataTemplate DataType="vm:LibraryViewModel"><v:LibraryView /></DataTemplate>
+    <DataTemplate DataType="vm:PlaylistViewModel"><v:PlaylistView /></DataTemplate>
+    <DataTemplate DataType="vm:MatchReviewViewModel"><v:MatchReviewView /></DataTemplate>
+    <DataTemplate DataType="vm:TrackEditorViewModel"><v:TrackEditorView /></DataTemplate>
+    <DataTemplate DataType="vm:ExportViewModel"><v:ExportView /></DataTemplate>
+    <DataTemplate DataType="vm:TransferViewModel"><v:TransferView /></DataTemplate>
+    <DataTemplate DataType="vm:QueueViewModel"><v:QueueView /></DataTemplate>
+    <DataTemplate DataType="vm:HistoryViewModel"><v:HistoryView /></DataTemplate>
+    <DataTemplate DataType="vm:SettingsViewModel"><v:SettingsView /></DataTemplate>
+  </Window.DataTemplates>
+
+  <Panel>
+    <Grid ColumnDefinitions="248,*" RowDefinitions="Auto,*,Auto">
+
+      <!-- ============ Navigation latérale ============ -->
+      <Border Grid.RowSpan="3" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource StrokeBrush}" BorderThickness="0,0,1,0">
+        <DockPanel Margin="14,26,14,14">
+          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="11" Margin="8,2,0,24">
+            <Image Source="/Assets/musilib.png" Width="36" Height="36" />
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="Musilib" FontSize="17" FontWeight="Bold" />
+              <TextBlock Text="MANAGER" Classes="caption" />
+            </StackPanel>
+          </StackPanel>
+
+          <StackPanel DockPanel.Dock="Bottom" Spacing="10" Margin="8,12,4,0">
+            <Border Classes="badge accent" IsVisible="{Binding IsDemo}" HorizontalAlignment="Stretch">
+              <TextBlock Text="MODE DÉMONSTRATION" HorizontalAlignment="Center" />
+            </Border>
+            <Border Classes="panel" Padding="12,10">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                  <Ellipse Classes="dot" Classes.on="{Binding YouTubeConnected}" />
+                  <TextBlock Text="YouTube" Classes="small" />
+                  <TextBlock Text="connecté" Classes="small subtle" IsVisible="{Binding YouTubeConnected}" />
+                  <TextBlock Text="hors ligne" Classes="small subtle" IsVisible="{Binding !YouTubeConnected}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                  <Ellipse Classes="dot" Classes.on="{Binding SpotifyConnected}" />
+                  <TextBlock Text="Spotify" Classes="small" />
+                  <TextBlock Text="connecté" Classes="small subtle" IsVisible="{Binding SpotifyConnected}" />
+                  <TextBlock Text="hors ligne" Classes="small subtle" IsVisible="{Binding !SpotifyConnected}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{Binding Version}" Classes="small subtle" VerticalAlignment="Center" />
+              <Button Grid.Column="1" Classes="icon" Width="28" Height="28" Command="{Binding OpenLogsCommand}" ToolTip.Tip="Ouvrir le dossier des journaux">
+                <c:LineIcon Data="{StaticResource Icon.File}" Classes="small" />
+              </Button>
+            </Grid>
+          </StackPanel>
+
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Sections}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:NavSection">
+                  <StackPanel Margin="0,0,0,18">
+                    <TextBlock Text="{Binding Title}" Classes="caption" Margin="12,0,0,8" />
+                    <ItemsControl ItemsSource="{Binding Items}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:NavItemViewModel">
+                          <Button Classes="nav" Classes.active="{Binding IsActive}" Command="{Binding NavigateCommand}">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                              <c:LineIcon Data="{Binding IconKey, Converter={x:Static conv:IconKeyConverter.Instance}}" Margin="0,0,12,0" />
+                              <TextBlock Grid.Column="1" Text="{Binding Title}" VerticalAlignment="Center" />
+                              <Border Grid.Column="2" Classes="badge accent" Padding="7,1" IsVisible="{Binding HasBadge}">
+                                <TextBlock Text="{Binding BadgeText}" />
+                              </Border>
+                            </Grid>
+                          </Button>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </DockPanel>
+      </Border>
+
+      <!-- ============ Barre supérieure ============ -->
+      <Grid Grid.Column="1" ColumnDefinitions="Auto,*,Auto,Auto" Margin="28,40,28,4" MinHeight="44">
+        <Button Classes="icon" Command="{Binding GoBackCommand}" IsVisible="{Binding CanGoBack}" Margin="-8,0,8,0" ToolTip.Tip="Retour">
+          <c:LineIcon Data="{StaticResource Icon.ChevronLeft}" />
+        </Button>
+        <TextBlock Grid.Column="1" Text="{Binding CurrentPage.Title, FallbackValue=''}" Classes="h1" VerticalAlignment="Center" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Margin="0,0,12,0" VerticalAlignment="Center"
+                    IsVisible="{Binding CurrentPage.IsBusy, FallbackValue=False}">
+          <c:LineIcon Data="{StaticResource Icon.Refresh}" Classes="spin small" Foreground="{DynamicResource AccentBrush}" />
+          <TextBlock Text="{Binding CurrentPage.BusyText, FallbackValue=''}" Classes="small muted" VerticalAlignment="Center" />
+        </StackPanel>
+        <ComboBox Grid.Column="3" MinWidth="300" MaxWidth="420" PlaceholderText="Choisir une playlist…"
+                  IsVisible="{Binding CurrentPage.UsesPlaylist, FallbackValue=False}"
+                  ItemsSource="{Binding State.Playlists}" SelectedItem="{Binding State.SelectedPlaylist}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="d:Playlist">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <c:CoverArt Source="{Binding ThumbnailUrl}" FallbackText="{Binding Title}" Width="26" Height="26" CornerRadius="5" DecodeWidth="64" />
+                <TextBlock Text="{Binding Title}" VerticalAlignment="Center" MaxWidth="300" />
+              </StackPanel>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </Grid>
+
+      <!-- ============ Contenu ============ -->
+      <TransitioningContentControl Grid.Column="1" Grid.Row="1" Content="{Binding CurrentPage}" Margin="28,8,28,20">
+        <TransitioningContentControl.PageTransition>
+          <CrossFade Duration="0:0:0.16" />
+        </TransitioningContentControl.PageTransition>
+      </TransitioningContentControl>
+
+      <!-- ============ Lecteur ============ -->
+      <Border Grid.Column="1" Grid.Row="2" IsVisible="{Binding Player.HasMedia}" Background="{DynamicResource SurfaceBrush}"
+              BorderBrush="{DynamicResource StrokeBrush}" BorderThickness="0,1,0,0" Padding="24,10">
+        <Grid ColumnDefinitions="300,*,240">
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <c:CoverArt Source="{Binding Player.NowPlayingCover}" FallbackText="{Binding Player.NowPlayingTitle}" Width="48" Height="48" CornerRadius="6" />
+            <StackPanel VerticalAlignment="Center" MaxWidth="230">
+              <TextBlock Text="{Binding Player.NowPlayingTitle}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding Player.NowPlayingSubtitle}" Classes="small muted" />
+              <TextBlock Text="{Binding Player.SourceLabel}" Classes="caption" Margin="0,2,0,0" />
+            </StackPanel>
+          </StackPanel>
+          <Grid Grid.Column="1" ColumnDefinitions="Auto,Auto,Auto,*,Auto" VerticalAlignment="Center" Margin="16,0">
+            <Button Classes="play" Command="{Binding Player.ToggleCommand}" Width="38" Height="38">
+              <Panel>
+                <c:LineIcon Data="{StaticResource Icon.Pause}" IsVisible="{Binding Player.IsPlaying}" Classes="small" />
+                <c:LineIcon Data="{StaticResource Icon.Play}" IsVisible="{Binding !Player.IsPlaying}" Classes="small" />
+              </Panel>
+            </Button>
+            <Button Grid.Column="1" Classes="icon" Command="{Binding Player.StopCommand}" Margin="6,0" ToolTip.Tip="Arrêter">
+              <c:LineIcon Data="{StaticResource Icon.Stop}" Classes="small" />
+            </Button>
+            <TextBlock Grid.Column="2" Text="{Binding Player.PositionText}" Classes="small muted" VerticalAlignment="Center" Margin="4,0,10,0" />
+            <Slider Grid.Column="3" Minimum="0" Maximum="{Binding Player.Duration}" Value="{Binding Player.Position}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="4" Text="{Binding Player.DurationText}" Classes="small muted" VerticalAlignment="Center" Margin="10,0,0,0" />
+          </Grid>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <c:LineIcon Data="{StaticResource Icon.Volume}" Foreground="{DynamicResource TextSecondaryBrush}" Classes="small" />
+            <Slider Width="140" Minimum="0" Maximum="100" Value="{Binding Player.Volume}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- ============ Notifications ============ -->
+    <ItemsControl ItemsSource="{Binding Notifications.Toasts}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,84">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="s:ToastViewModel">
+          <Border Classes="toast">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <Panel Margin="0,1,12,0" VerticalAlignment="Top">
+                <c:LineIcon Data="{Binding IconKey, Converter={x:Static conv:IconKeyConverter.Instance}}" Foreground="{DynamicResource SuccessBrush}" IsVisible="{Binding IsSuccess}" />
+                <c:LineIcon Data="{Binding IconKey, Converter={x:Static conv:IconKeyConverter.Instance}}" Foreground="{DynamicResource WarningBrush}" IsVisible="{Binding IsWarning}" />
+                <c:LineIcon Data="{Binding IconKey, Converter={x:Static conv:IconKeyConverter.Instance}}" Foreground="{DynamicResource DangerBrush}" IsVisible="{Binding IsError}" />
+                <c:LineIcon Data="{Binding IconKey, Converter={x:Static conv:IconKeyConverter.Instance}}" Foreground="{DynamicResource InfoBrush}" IsVisible="{Binding IsInfo}" />
+              </Panel>
+              <StackPanel Grid.Column="1" Spacing="2">
+                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Classes="wrap" />
+                <TextBlock Text="{Binding Message}" Classes="small muted wrap" IsVisible="{Binding HasMessage}" />
+              </StackPanel>
+              <Button Grid.Column="2" Classes="icon" Width="24" Height="24" Margin="8,-4,-6,0" VerticalAlignment="Top" Command="{Binding CloseCommand}">
+                <c:LineIcon Data="{StaticResource Icon.X}" Width="12" Height="12" />
+              </Button>
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <!-- ============ Dialogue de confirmation ============ -->
+    <Border Background="{DynamicResource OverlayBrush}" IsVisible="{Binding Dialogs.Current, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <Border Classes="card" Width="520" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28,24"
+              BoxShadow="0 24 60 0 #80000000" DataContext="{Binding Dialogs.Current}">
+        <StackPanel Spacing="14" x:DataType="s:ConfirmDialogViewModel">
+          <TextBlock Text="{Binding Title}" Classes="h2 wrap" />
+          <TextBlock Text="{Binding Message}" Classes="muted wrap" />
+          <Border Classes="panel" IsVisible="{Binding HasDetails}">
+            <ItemsControl ItemsSource="{Binding Details}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                    <c:LineIcon Data="{StaticResource Icon.ChevronRight}" Classes="small" Foreground="{DynamicResource AccentBrush}" Margin="0,1,8,0" VerticalAlignment="Top" />
+                    <TextBlock Grid.Column="1" Text="{Binding}" Classes="small wrap" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Border>
+          <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button Content="Annuler" Classes="ghost" Command="{Binding CancelCommand}" IsCancel="True" />
+            <Button Content="{Binding ConfirmText}" Classes="primary" Command="{Binding ConfirmCommand}" IsVisible="{Binding IsNotDanger}" IsDefault="True" />
+            <Button Content="{Binding ConfirmText}" Classes="danger" Command="{Binding ConfirmCommand}" IsVisible="{Binding IsDanger}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Border>
+
+    <!-- ============ Initialisation ============ -->
+    <Border Background="{DynamicResource AppBackgroundBrush}" IsVisible="{Binding IsInitializing}">
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16" Width="380">
+        <Image Source="/Assets/musilib.png" Width="72" Height="72" />
+        <TextBlock Text="Musilib Manager" Classes="h1" HorizontalAlignment="Center" />
+        <ProgressBar IsIndeterminate="True" Classes="thin" IsVisible="{Binding FatalError, Converter={x:Static ObjectConverters.IsNull}}" />
+        <TextBlock Text="{Binding InitText}" Classes="muted" HorizontalAlignment="Center" />
+        <Border Classes="notice danger" IsVisible="{Binding FatalError, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <StackPanel Spacing="6">
+            <TextBlock Text="Impossible de démarrer" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding FatalError}" Classes="small wrap" />
+            <Button Content="Ouvrir les journaux" Classes="small outline" Command="{Binding OpenLogsCommand}" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </Border>
+  </Panel>
+</Window>

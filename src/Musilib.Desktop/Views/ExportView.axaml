@@ -1,0 +1,166 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Musilib.Desktop.ViewModels"
+             xmlns:c="using:Musilib.Desktop.Controls"
+             x:Class="Musilib.Desktop.Views.ExportView"
+             x:DataType="vm:ExportViewModel">
+  <Panel>
+    <Border Classes="card" IsVisible="{Binding HasNoPlaylist}" VerticalAlignment="Top">
+      <StackPanel Spacing="10" HorizontalAlignment="Center" Margin="0,48">
+        <c:LineIcon Data="{StaticResource Icon.Download}" Classes="huge" Foreground="{DynamicResource TextTertiaryBrush}" HorizontalAlignment="Center" />
+        <TextBlock Text="Aucune playlist sélectionnée" Classes="h3" HorizontalAlignment="Center" />
+      </StackPanel>
+    </Border>
+
+    <Grid ColumnDefinitions="*,360" IsVisible="{Binding HasPlaylist}">
+      <!-- Morceaux et fichiers -->
+      <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="0,0,16,0">
+        <Border Classes="notice" Margin="0,0,0,12">
+          <Grid ColumnDefinitions="Auto,*">
+            <c:LineIcon Data="{StaticResource Icon.Info}" Foreground="{DynamicResource InfoBrush}" Margin="0,0,10,0" VerticalAlignment="Top" />
+            <TextBlock Grid.Column="1" Classes="small wrap"
+                       Text="L'export organise et taggue les fichiers audio que vous possédez déjà (CD rippés, achats, téléchargements autorisés). YouTube et Spotify ne fournissent pas de fichiers audio téléchargeables via leurs API : Musilib n'extrait jamais l'audio de ces services." />
+          </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,10">
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Fichiers sources" Classes="h2" />
+            <TextBlock Text="{Binding LocalSummary}" Classes="small muted" />
+          </StackPanel>
+          <Button Grid.Column="1" Classes="outline" Command="{Binding ScanFolderCommand}" Margin="8,0,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <c:LineIcon Data="{StaticResource Icon.FolderOpen}" Classes="small" />
+              <TextBlock Text="Associer depuis un dossier…" />
+            </StackPanel>
+          </Button>
+          <Button Grid.Column="2" Classes="ghost small" Content="Tout cocher" Command="{Binding SelectAllCommand}" Margin="8,0,0,0" />
+          <Button Grid.Column="3" Classes="ghost small" Content="Aucun" Command="{Binding SelectNoneCommand}" />
+        </Grid>
+
+        <Border Grid.Row="2" Classes="notice success" Margin="0,0,0,10" IsVisible="{Binding HasScanSummary}">
+          <TextBlock Text="{Binding ScanSummary}" Classes="small wrap" />
+        </Border>
+
+        <Border Grid.Row="3" Classes="card flush" Padding="4">
+          <ListBox Classes="rows" ItemsSource="{Binding Rows}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:ExportRowViewModel">
+                <Grid ColumnDefinitions="36,30,48,2*,2*,Auto" MinHeight="50">
+                  <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="{Binding HasLocalFile}" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1" Text="{Binding Number}" Classes="small muted" VerticalAlignment="Center" />
+                  <c:CoverArt Grid.Column="2" Source="{Binding Cover}" FallbackText="{Binding FallbackText}" Width="38" Height="38" CornerRadius="6" DecodeWidth="96" />
+                  <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="10,0">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Artists}" Classes="small muted" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="4" VerticalAlignment="Center" Margin="0,0,10,0" Spacing="3">
+                    <Grid ColumnDefinitions="Auto,*">
+                      <c:LineIcon Data="{StaticResource Icon.File}" Width="12" Height="12" Margin="0,0,6,0" Foreground="{DynamicResource PurpleBrush}" IsVisible="{Binding HasLocalFile}" />
+                      <TextBlock Grid.Column="1" Text="{Binding LocalFile}" Classes="small" Classes.subtle="{Binding HasNoLocalFile}" ToolTip.Tip="{Binding LocalFilePath}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding Target, Converter={x:Static ObjectConverters.IsNotNull}}">
+                      <Border Classes="badge" Padding="7,1" Classes.success="{Binding Action.IsSuccess}" Classes.warning="{Binding Action.IsWarning}"
+                              Classes.danger="{Binding Action.IsDanger}" Classes.info="{Binding Action.IsInfo}">
+                        <TextBlock Text="{Binding Action.Text}" FontSize="10.5" />
+                      </Border>
+                      <TextBlock Grid.Column="1" Text="{Binding Target}" Classes="small subtle" Margin="6,0,0,0" VerticalAlignment="Center" ToolTip.Tip="{Binding Target}" />
+                    </Grid>
+                  </StackPanel>
+                  <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="2">
+                    <Button Classes="icon" Command="{Binding AssociateCommand}" ToolTip.Tip="Associer un fichier audio">
+                      <c:LineIcon Data="{StaticResource Icon.Plus}" Classes="small" />
+                    </Button>
+                    <Button Classes="icon" Command="{Binding UnlinkCommand}" IsVisible="{Binding HasLocalFile}" ToolTip.Tip="Dissocier">
+                      <c:LineIcon Data="{StaticResource Icon.X}" Classes="small" />
+                    </Button>
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Border>
+      </Grid>
+
+      <!-- Options -->
+      <ScrollViewer Grid.Column="1" Classes="page">
+        <StackPanel Spacing="14" Margin="0,0,6,0">
+          <Border Classes="card">
+            <StackPanel Spacing="14">
+              <TextBlock Text="Destination" Classes="h2" />
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBox Text="{Binding Destination}" />
+                <Button Grid.Column="1" Classes="icon" Margin="6,0,0,0" Command="{Binding PickDestinationCommand}" ToolTip.Tip="Parcourir">
+                  <c:LineIcon Data="{StaticResource Icon.Folder}" Classes="small" />
+                </Button>
+              </Grid>
+              <StackPanel>
+                <TextBlock Text="Organisation" Classes="label" />
+                <ComboBox ItemsSource="{Binding Organizations}" SelectedItem="{Binding Organization}" HorizontalAlignment="Stretch" />
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="Si un fichier existe déjà" Classes="label" />
+                <ComboBox ItemsSource="{Binding Conflicts}" SelectedItem="{Binding Conflict}" HorizontalAlignment="Stretch" />
+              </StackPanel>
+              <TextBlock Text="Nom des fichiers : « Artiste - Titre » (caractères interdits sous Windows remplacés)." Classes="small subtle wrap" />
+            </StackPanel>
+          </Border>
+
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Métadonnées" Classes="h2" />
+              <CheckBox Content="Écrire les tags (ID3 / Vorbis / MP4)" IsChecked="{Binding WriteTags}" />
+              <CheckBox Content="Intégrer la pochette" IsChecked="{Binding EmbedCover}" IsEnabled="{Binding WriteTags}" />
+              <CheckBox Content="Créer une playlist M3U8" IsChecked="{Binding WriteM3u}" />
+            </StackPanel>
+          </Border>
+
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Format" Classes="h2" />
+              <ComboBox ItemsSource="{Binding Formats}" SelectedItem="{Binding Format}" HorizontalAlignment="Stretch" />
+              <StackPanel IsVisible="{Binding IsConverting}" Spacing="6">
+                <TextBlock Text="Débit (kbit/s)" Classes="label" />
+                <NumericUpDown Value="{Binding Bitrate}" Minimum="64" Maximum="320" Increment="32" FormatString="0" />
+              </StackPanel>
+              <TextBlock Text="Conversion via FFmpeg, uniquement si le format diffère. L'original est toujours préservé." Classes="small subtle wrap" />
+              <Border Classes="notice warning" IsVisible="{Binding FfmpegMissing}">
+                <TextBlock Text="FFmpeg n'est pas installé : les fichiers seront exportés dans leur format d'origine. Indiquez son chemin dans les Paramètres." Classes="small wrap" />
+              </Border>
+            </StackPanel>
+          </Border>
+
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="{Binding PlanSummary}" Classes="small muted wrap" IsVisible="{Binding PlanReady}" />
+              <Button Classes="outline" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding PreviewCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <c:LineIcon Data="{StaticResource Icon.Eye}" Classes="small" />
+                  <TextBlock Text="Prévisualiser (doublons, conflits)" />
+                </StackPanel>
+              </Button>
+              <Button Classes="primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding ExportCommand}" IsEnabled="{Binding !HasActiveJob}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <c:LineIcon Data="{StaticResource Icon.Download}" Classes="small" />
+                  <TextBlock Text="Exporter" />
+                </StackPanel>
+              </Button>
+              <StackPanel Spacing="6" IsVisible="{Binding HasActiveJob}">
+                <ProgressBar Value="{Binding ActiveJob.Progress, FallbackValue=0}" Maximum="100" />
+                <TextBlock Text="{Binding ActiveJob.ProgressText, FallbackValue=''}" Classes="small muted" />
+                <TextBlock Text="{Binding ActiveJob.CurrentItem, FallbackValue=''}" Classes="small subtle" />
+              </StackPanel>
+              <Border Classes="notice success" IsVisible="{Binding HasLastResult}">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="{Binding LastResult}" Classes="small wrap" />
+                  <TextBlock Text="{Binding LastM3u}" Classes="small subtle wrap" IsVisible="{Binding LastM3u, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                </StackPanel>
+              </Border>
+              <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Content="Ouvrir le dossier de destination" Command="{Binding OpenDestinationCommand}" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Panel>
+</UserControl>

@@ -1,0 +1,223 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Musilib.Desktop.ViewModels"
+             xmlns:c="using:Musilib.Desktop.Controls"
+             x:Class="Musilib.Desktop.Views.MatchReviewView"
+             x:DataType="vm:MatchReviewViewModel">
+  <Grid ColumnDefinitions="320,*">
+    <!-- ============ File de vérification ============ -->
+    <Border Classes="card flush" Margin="0,0,16,0">
+      <Grid RowDefinitions="Auto,*">
+        <StackPanel Margin="16,14,16,8" Spacing="8">
+          <TextBlock Text="{Binding QueueTitle}" Classes="h3" />
+          <ToggleSwitch IsChecked="{Binding OnlyToReview}" OnContent="Seulement à vérifier" OffContent="Tous les morceaux" />
+        </StackPanel>
+        <Panel Grid.Row="1">
+          <StackPanel IsVisible="{Binding IsQueueEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8" Margin="16">
+            <c:LineIcon Data="{StaticResource Icon.CheckCircle}" Classes="huge" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Center" />
+            <TextBlock Text="Rien à vérifier" Classes="h3" HorizontalAlignment="Center" />
+            <TextBlock Text="Toutes les correspondances sont fiables ou confirmées." Classes="small muted wrap" TextAlignment="Center" />
+          </StackPanel>
+          <ListBox Classes="rows" ItemsSource="{Binding Queue}" SelectedItem="{Binding Selected}" Margin="6,0,6,6">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:TrackRowViewModel">
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,2">
+                  <c:CoverArt Source="{Binding Cover}" FallbackText="{Binding FallbackText}" Width="40" Height="40" CornerRadius="6" Grid.RowSpan="2" Margin="0,0,10,0" DecodeWidth="96" />
+                  <TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="SemiBold" />
+                  <Grid Grid.Column="1" Grid.Row="1" ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding Artists}" Classes="small muted" VerticalAlignment="Center" />
+                    <Border Grid.Column="1" Classes="badge" Padding="7,1" Margin="6,0,0,0" Classes.success="{Binding Badge.IsSuccess}" Classes.warning="{Binding Badge.IsWarning}"
+                            Classes.danger="{Binding Badge.IsDanger}" Classes.info="{Binding Badge.IsInfo}" Classes.accent="{Binding Badge.IsAccent}">
+                      <TextBlock Text="{Binding Badge.Text}" FontSize="10.5" />
+                    </Border>
+                  </Grid>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Panel>
+      </Grid>
+    </Border>
+
+    <!-- ============ Comparaison ============ -->
+    <Panel Grid.Column="1">
+      <Border Classes="card" IsVisible="{Binding HasNoSelection}" VerticalAlignment="Top">
+        <StackPanel Spacing="10" HorizontalAlignment="Center" Margin="0,48">
+          <c:LineIcon Data="{StaticResource Icon.Compare}" Classes="huge" Foreground="{DynamicResource TextTertiaryBrush}" HorizontalAlignment="Center" />
+          <TextBlock Text="Sélectionnez un morceau" Classes="h3" HorizontalAlignment="Center" />
+          <TextBlock Text="Choisissez une playlist puis un morceau à comparer." Classes="muted" HorizontalAlignment="Center" />
+        </StackPanel>
+      </Border>
+
+      <Grid RowDefinitions="Auto,Auto,Auto,*" IsVisible="{Binding HasSelection}">
+        <!-- Source -->
+        <Border Classes="card">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <Panel Margin="0,0,18,0" VerticalAlignment="Top">
+              <c:CoverArt Source="{Binding SourceThumb}" FallbackText="{Binding SourceTitle}" Width="160" Height="90" CornerRadius="10" DecodeWidth="320" />
+              <Border Classes="chip youtube small" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6" Background="#CC000000">
+                <c:LineIcon Data="{StaticResource Icon.YouTube}" Classes="small" />
+              </Border>
+            </Panel>
+            <StackPanel Grid.Column="1" Spacing="4">
+              <TextBlock Text="SOURCE YOUTUBE" Classes="caption" />
+              <TextBlock Text="{Binding SourceTitle}" Classes="h2" />
+              <TextBlock Classes="small muted">
+                <Run Text="{Binding SourceChannel}" />
+                <Run Text=" · " />
+                <Run Text="{Binding SourceDuration}" />
+              </TextBlock>
+              <Grid ColumnDefinitions="Auto,*" Margin="0,8,0,0">
+                <Border Classes="badge" Classes.success="{Binding Badge.IsSuccess, FallbackValue=False}" Classes.warning="{Binding Badge.IsWarning, FallbackValue=False}"
+                        Classes.danger="{Binding Badge.IsDanger, FallbackValue=False}" Classes.info="{Binding Badge.IsInfo, FallbackValue=False}"
+                        Classes.accent="{Binding Badge.IsAccent, FallbackValue=False}" Margin="0,0,8,0">
+                  <TextBlock Text="{Binding Badge.Text, FallbackValue=''}" />
+                </Border>
+                <TextBlock Grid.Column="1" Classes="small muted" VerticalAlignment="Center">
+                  <Run Text="Recherche : " />
+                  <Run Text="{Binding ParsedArtists}" FontWeight="SemiBold" />
+                  <Run Text=" — " />
+                  <Run Text="{Binding ParsedTitle}" FontWeight="SemiBold" />
+                </TextBlock>
+              </Grid>
+              <TextBlock Text="{Binding StatusReason}" Classes="small warning wrap" IsVisible="{Binding HasStatusReason}" Margin="0,4,0,0" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Spacing="6">
+              <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                <Button Classes="icon" Command="{Binding PreviousCommand}" ToolTip.Tip="Précédent"><c:LineIcon Data="{StaticResource Icon.ChevronLeft}" /></Button>
+                <Button Classes="icon" Command="{Binding NextCommand}" ToolTip.Tip="Suivant"><c:LineIcon Data="{StaticResource Icon.ChevronRight}" /></Button>
+              </StackPanel>
+              <Button Classes="ghost small" Command="{Binding OpenYouTubeCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:LineIcon Data="{StaticResource Icon.External}" Classes="small" />
+                  <TextBlock Text="Voir sur YouTube" />
+                </StackPanel>
+              </Button>
+              <Button Classes="ghost small" Command="{Binding EditMetadataCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:LineIcon Data="{StaticResource Icon.Edit}" Classes="small" />
+                  <TextBlock Text="Éditer" />
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- Recherche manuelle -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,14,0,0">
+          <Panel>
+            <TextBox Classes="search" Text="{Binding ManualQuery}" Watermark="Recherche manuelle : artiste titre, ou filtres Spotify (track:… artist:… isrc:…)" />
+            <c:LineIcon Data="{StaticResource Icon.Search}" Classes="small" Foreground="{DynamicResource TextTertiaryBrush}" HorizontalAlignment="Left" Margin="14,0,0,0" IsHitTestVisible="False" />
+          </Panel>
+          <Button Grid.Column="1" Classes="primary" Content="Rechercher" Command="{Binding ManualSearchCommand}" Margin="10,0,0,0" IsDefault="True" />
+          <Button Grid.Column="2" Classes="outline" Command="{Binding RematchCommand}" Margin="8,0,0,0" ToolTip.Tip="Relancer la recherche automatique">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <c:LineIcon Data="{StaticResource Icon.Refresh}" Classes="small" />
+              <TextBlock Text="Auto" />
+            </StackPanel>
+          </Button>
+        </Grid>
+
+        <!-- Décision -->
+        <DockPanel Grid.Row="2" Margin="0,12,0,10">
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+            <Button Classes="primary small" Command="{Binding ConfirmCommand}" IsVisible="{Binding CanConfirm}">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <c:LineIcon Data="{StaticResource Icon.Check}" Classes="small" />
+                <TextBlock Text="Confirmer l'automatique" />
+              </StackPanel>
+            </Button>
+            <Button Classes="outline small" Content="Aucune ne correspond" Command="{Binding RejectCommand}" />
+            <Button Classes="ghost small" Content="Exclure / inclure" Command="{Binding ExcludeCommand}" />
+          </StackPanel>
+          <WrapPanel VerticalAlignment="Center">
+            <CheckBox Content="Appliquer les métadonnées Spotify" IsChecked="{Binding ApplyMetadata}" Margin="0,0,18,0" />
+            <CheckBox Content="Passer au suivant après validation" IsChecked="{Binding AutoAdvance}" />
+          </WrapPanel>
+        </DockPanel>
+
+        <!-- Candidats -->
+        <Panel Grid.Row="3">
+          <ProgressBar IsIndeterminate="True" Classes="thin" VerticalAlignment="Top" IsVisible="{Binding CandidatesLoading}" />
+          <Border Classes="card" IsVisible="{Binding NoCandidates}" VerticalAlignment="Top">
+            <StackPanel Spacing="8" HorizontalAlignment="Center" Margin="0,24">
+              <c:LineIcon Data="{StaticResource Icon.Search}" Classes="huge" Foreground="{DynamicResource TextTertiaryBrush}" HorizontalAlignment="Center" />
+              <TextBlock Text="Aucun résultat Spotify" Classes="h3" HorizontalAlignment="Center" />
+              <TextBlock Text="Lancez une recherche manuelle avec une requête simplifiée, ou éditez les métadonnées." Classes="muted" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Border>
+          <ScrollViewer Classes="page">
+            <ItemsControl ItemsSource="{Binding Candidates}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:CandidateViewModel">
+                  <Border Classes="card tight" Margin="0,0,8,10" Classes.selected="{Binding IsCurrent}">
+                    <Grid ColumnDefinitions="Auto,*,190,Auto">
+                      <Panel Margin="0,0,16,0">
+                        <c:CoverArt Source="{Binding Cover}" FallbackText="{Binding FallbackText}" Width="84" Height="84" CornerRadius="8" />
+                        <Button Classes="play" Width="34" Height="34" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="4"
+                                Command="{Binding PlayCommand}" IsVisible="{Binding HasPreview}" ToolTip.Tip="Écouter l'extrait Spotify">
+                          <c:LineIcon Data="{StaticResource Icon.Play}" Width="13" Height="13" />
+                        </Button>
+                      </Panel>
+                      <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                          <TextBlock Text="{Binding Title}" Classes="h3" ToolTip.Tip="{Binding Title}" />
+                          <Border Grid.Column="1" Classes="badge accent" Padding="7,1" Margin="8,0,0,0" IsVisible="{Binding IsBest}"><TextBlock Text="Meilleur score" FontSize="10.5" /></Border>
+                          <Border Grid.Column="2" Classes="badge" Padding="6,1" Margin="6,0,0,0" IsVisible="{Binding IsExplicit}"><TextBlock Text="E" FontSize="10.5" /></Border>
+                        </Grid>
+                        <TextBlock Text="{Binding Artists}" Classes="muted" />
+                        <TextBlock Classes="small subtle">
+                          <Run Text="{Binding Album}" />
+                          <Run Text=" · " />
+                          <Run Text="{Binding ReleaseDate}" />
+                          <Run Text=" · ISRC " />
+                          <Run Text="{Binding Isrc}" />
+                        </TextBlock>
+                        <TextBlock Classes="small subtle">
+                          <Run Text="Durée " />
+                          <Run Text="{Binding Duration}" FontWeight="SemiBold" />
+                          <Run Text="  " />
+                          <Run Text="{Binding DurationDiff}" />
+                        </TextBlock>
+                      </StackPanel>
+                      <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center" Margin="12,0">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding ScoreText}" FontSize="22" FontWeight="Bold" Classes.success="{Binding IsHighScore}"
+                                     Classes.warning="{Binding IsMediumScore}" Classes.danger="{Binding IsLowScore}" />
+                          <TextBlock Text="correspondance" Classes="small subtle" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="52,*" RowDefinitions="Auto,Auto,Auto">
+                          <TextBlock Text="Titre" Classes="small subtle" />
+                          <c:MeterBar Grid.Column="1" Fill="{DynamicResource InfoBrush}" Value="{Binding TitleScore}" Maximum="100" VerticalAlignment="Center" Track="{DynamicResource SurfaceHoverBrush}" />
+                          <TextBlock Grid.Row="1" Text="Artiste" Classes="small subtle" />
+                          <c:MeterBar Grid.Row="1" Grid.Column="1" Fill="{DynamicResource InfoBrush}" Value="{Binding ArtistScore}" Maximum="100" VerticalAlignment="Center" Track="{DynamicResource SurfaceHoverBrush}" />
+                          <TextBlock Grid.Row="2" Text="Durée" Classes="small subtle" />
+                          <c:MeterBar Grid.Row="2" Grid.Column="1" Fill="{DynamicResource InfoBrush}" Value="{Binding DurationScore}" Maximum="100" VerticalAlignment="Center" Track="{DynamicResource SurfaceHoverBrush}" />
+                        </Grid>
+                      </StackPanel>
+                      <StackPanel Grid.Column="3" Spacing="6" VerticalAlignment="Center" Width="130">
+                        <Button Classes="primary small" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding SelectCommand}" IsVisible="{Binding !IsCurrent}">
+                          <TextBlock Text="Choisir" />
+                        </Button>
+                        <Border Classes="badge success" HorizontalAlignment="Center" IsVisible="{Binding IsCurrent}">
+                          <StackPanel Orientation="Horizontal" Spacing="4">
+                            <c:LineIcon Data="{StaticResource Icon.Check}" Width="12" Height="12" Foreground="{DynamicResource SuccessBrush}" />
+                            <TextBlock Text="Sélectionné" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource SuccessBrush}" />
+                          </StackPanel>
+                        </Border>
+                        <Button Classes="ghost small" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                Command="{Binding $parent[UserControl].((vm:MatchReviewViewModel)DataContext).OpenInSpotifyCommand}" CommandParameter="{Binding}">
+                          <TextBlock Text="Ouvrir ↗" />
+                        </Button>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Panel>
+      </Grid>
+    </Panel>
+  </Grid>
+</UserControl>

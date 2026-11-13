@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Musilib.Infrastructure</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Musilib.Application\Musilib.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="TagLibSharp" />
+    <PackageReference Include="NAudio.Core" />
+    <PackageReference Include="NAudio.Wasapi" />
+    <PackageReference Include="NAudio.WinMM" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Musilib.Tests" />
+  </ItemGroup>
+</Project>

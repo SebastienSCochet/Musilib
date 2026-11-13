@@ -1,0 +1,202 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Musilib.Desktop.ViewModels"
+             xmlns:c="using:Musilib.Desktop.Controls"
+             x:Class="Musilib.Desktop.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+  <Grid RowDefinitions="*,Auto">
+    <ScrollViewer Classes="page">
+      <Grid ColumnDefinitions="*,*" Margin="0,0,8,12">
+        <StackPanel Spacing="16" Margin="0,0,8,0">
+          <!-- Général -->
+          <Border Classes="card">
+            <StackPanel Spacing="14">
+              <TextBlock Text="Général" Classes="h2" />
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel>
+                  <TextBlock Text="Mode démonstration" FontWeight="SemiBold" />
+                  <TextBlock Text="Données fictives, sans connexion aux comptes. Base de données séparée." Classes="small muted wrap" />
+                </StackPanel>
+                <ToggleSwitch Grid.Column="1" IsChecked="{Binding DemoMode}" OnContent="" OffContent="" />
+              </Grid>
+              <Grid ColumnDefinitions="*,200">
+                <StackPanel>
+                  <TextBlock Text="Thème" FontWeight="SemiBold" />
+                  <TextBlock Text="Sombre par défaut" Classes="small muted" />
+                </StackPanel>
+                <ComboBox Grid.Column="1" ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme}" HorizontalAlignment="Stretch" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- Traitements -->
+          <Border Classes="card">
+            <StackPanel Spacing="14">
+              <TextBlock Text="Traitements" Classes="h2" />
+              <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
+                <StackPanel Margin="0,0,8,12">
+                  <TextBlock Text="Traitements simultanés" Classes="label" />
+                  <NumericUpDown Value="{Binding MaxConcurrentJobs}" Minimum="1" Maximum="8" FormatString="0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0,0,12">
+                  <TextBlock Text="Requêtes parallèles / traitement" Classes="label" />
+                  <NumericUpDown Value="{Binding MaxConcurrentRequests}" Minimum="1" Maximum="16" FormatString="0" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Margin="0,0,8,12">
+                  <TextBlock Text="Tentatives (backoff exponentiel)" Classes="label" />
+                  <NumericUpDown Value="{Binding MaxRetries}" Minimum="0" Maximum="10" FormatString="0" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="8,0,0,12">
+                  <TextBlock Text="Retry-After maximum (s)" Classes="label" />
+                  <NumericUpDown Value="{Binding MaxRetryAfter}" Minimum="1" Maximum="3600" FormatString="0" />
+                </StackPanel>
+                <StackPanel Grid.Row="2" Margin="0,0,8,0">
+                  <TextBlock Text="Durée du cache de recherche (jours)" Classes="label" />
+                  <NumericUpDown Value="{Binding CacheDays}" Minimum="0" Maximum="365" FormatString="0" />
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Bottom">
+                  <CheckBox Content="Reprendre automatiquement au démarrage" IsChecked="{Binding AutoResume}" />
+                </StackPanel>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding CacheCount, StringFormat='{}{0} recherche(s) Spotify en cache'}" Classes="small muted" VerticalAlignment="Center" />
+                <Button Grid.Column="1" Classes="ghost small" Content="Vider le cache" Command="{Binding ClearCacheCommand}" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- Correspondances -->
+          <Border Classes="card">
+            <StackPanel Spacing="12">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="Correspondances" Classes="h2" />
+                <Button Grid.Column="1" Classes="ghost small" Content="Valeurs par défaut" Command="{Binding ResetMatchingCommand}" />
+              </Grid>
+              <TextBlock Text="Une correspondance n'est validée automatiquement que si son score dépasse le seuil ET qu'aucun autre résultat n'est trop proche. Sinon, elle est marquée « à vérifier »." Classes="small muted wrap" />
+              <Grid ColumnDefinitions="*,60">
+                <StackPanel>
+                  <TextBlock Text="Seuil de validation automatique" Classes="label" />
+                  <Slider Minimum="0.6" Maximum="1" Value="{Binding AutoAccept}" SmallChange="0.01" LargeChange="0.05" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding AutoAcceptText}" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" />
+              </Grid>
+              <Grid ColumnDefinitions="*,60">
+                <StackPanel>
+                  <TextBlock Text="Score minimum (en dessous : introuvable)" Classes="label" />
+                  <Slider Minimum="0.2" Maximum="0.9" Value="{Binding Minimum}" SmallChange="0.01" LargeChange="0.05" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding MinimumText}" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" />
+              </Grid>
+              <Grid ColumnDefinitions="*,60">
+                <StackPanel>
+                  <TextBlock Text="Écart minimal avec le 2ᵉ résultat" Classes="label" />
+                  <Slider Minimum="0" Maximum="0.3" Value="{Binding Gap}" SmallChange="0.01" LargeChange="0.05" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding GapText}" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" />
+              </Grid>
+              <Grid ColumnDefinitions="*,*">
+                <StackPanel Margin="0,0,8,0">
+                  <TextBlock Text="Résultats par recherche" Classes="label" />
+                  <NumericUpDown Value="{Binding SearchLimit}" Minimum="1" Maximum="50" FormatString="0" />
+                  <TextBlock Text="10 max. en mode développement Spotify" Classes="small subtle" Margin="0,4,0,0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                  <TextBlock Text="Marché Spotify" Classes="label" />
+                  <TextBox Text="{Binding Market}" Watermark="from_token, FR, BE…" />
+                </StackPanel>
+              </Grid>
+              <CheckBox Content="Appliquer les métadonnées Spotify aux correspondances fiables" IsChecked="{Binding ApplySpotifyMetadata}" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Spacing="16" Margin="8,0,0,0">
+          <!-- Export -->
+          <Border Classes="card">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Export local (valeurs par défaut)" Classes="h2" />
+              <StackPanel>
+                <TextBlock Text="Dossier par défaut" Classes="label" />
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBox Text="{Binding DefaultFolder}" Watermark="Musique\Musilib" />
+                  <Button Grid.Column="1" Classes="icon" Margin="6,0,0,0" Command="{Binding PickFolderCommand}">
+                    <c:LineIcon Data="{StaticResource Icon.Folder}" Classes="small" />
+                  </Button>
+                </Grid>
+              </StackPanel>
+              <Grid ColumnDefinitions="*,*">
+                <StackPanel Margin="0,0,8,0">
+                  <TextBlock Text="Organisation" Classes="label" />
+                  <ComboBox ItemsSource="{Binding Organizations}" SelectedItem="{Binding Organization}" HorizontalAlignment="Stretch" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                  <TextBlock Text="Conflits de noms" Classes="label" />
+                  <ComboBox ItemsSource="{Binding Conflicts}" SelectedItem="{Binding Conflict}" HorizontalAlignment="Stretch" />
+                </StackPanel>
+              </Grid>
+              <Grid ColumnDefinitions="*,*">
+                <StackPanel Margin="0,0,8,0">
+                  <TextBlock Text="Format" Classes="label" />
+                  <ComboBox ItemsSource="{Binding Formats}" SelectedItem="{Binding Format}" HorizontalAlignment="Stretch" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                  <TextBlock Text="Débit (kbit/s)" Classes="label" />
+                  <NumericUpDown Value="{Binding Bitrate}" Minimum="64" Maximum="320" Increment="32" FormatString="0" />
+                </StackPanel>
+              </Grid>
+              <StackPanel Spacing="6">
+                <CheckBox Content="Écrire les tags" IsChecked="{Binding WriteTags}" />
+                <CheckBox Content="Intégrer la pochette" IsChecked="{Binding EmbedCover}" />
+                <CheckBox Content="Créer une playlist M3U8" IsChecked="{Binding WriteM3u}" />
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="Chemin de FFmpeg (facultatif)" Classes="label" />
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBox Text="{Binding FfmpegPath}" Watermark="Détection automatique via le PATH" />
+                  <Button Grid.Column="1" Classes="icon" Margin="6,0,0,0" Command="{Binding PickFfmpegCommand}">
+                    <c:LineIcon Data="{StaticResource Icon.File}" Classes="small" />
+                  </Button>
+                </Grid>
+                <TextBlock Text="{Binding FfmpegStatus}" Classes="small subtle wrap" Margin="0,4,0,0" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- Données -->
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Données et confidentialité" Classes="h2" />
+              <TextBlock Classes="small muted wrap" Text="Aucun secret n'est stocké dans le code ni dans les fichiers de configuration. Les jetons OAuth, le client secret Google et la clé API sont chiffrés avec DPAPI (compte Windows courant). Les journaux masquent automatiquement jetons et identifiants." />
+              <Grid ColumnDefinitions="110,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                <TextBlock Text="Base SQLite" Classes="small subtle" Margin="0,0,0,6" />
+                <SelectableTextBlock Grid.Column="1" Text="{Binding DatabasePath}" Classes="mono" TextWrapping="Wrap" />
+                <TextBlock Grid.Row="1" Text="Paramètres" Classes="small subtle" Margin="0,0,0,6" />
+                <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SettingsPath}" Classes="mono" TextWrapping="Wrap" />
+                <TextBlock Grid.Row="2" Text="Journaux" Classes="small subtle" Margin="0,0,0,6" />
+                <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LogPath}" Classes="mono" TextWrapping="Wrap" />
+                <TextBlock Grid.Row="3" Text="Version" Classes="small subtle" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Version}" Classes="small" />
+              </Grid>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Classes="outline small" Content="Ouvrir le dossier de données" Command="{Binding OpenDataCommand}" />
+                <Button Classes="outline small" Content="Ouvrir les journaux" Command="{Binding OpenLogsCommand}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Grid>
+    </ScrollViewer>
+
+    <Border Grid.Row="1" Classes="card tight" Margin="0,8,8,0">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="Les modifications s'appliquent immédiatement après l'enregistrement (le changement de mode démo nécessite un redémarrage)." Classes="small muted" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Classes="primary" Command="{Binding SaveCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <c:LineIcon Data="{StaticResource Icon.Save}" Classes="small" />
+            <TextBlock Text="Enregistrer les paramètres" />
+          </StackPanel>
+        </Button>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

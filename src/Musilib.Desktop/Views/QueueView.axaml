@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Musilib.Desktop.ViewModels"
+             xmlns:c="using:Musilib.Desktop.Controls"
+             xmlns:conv="using:Musilib.Desktop.Converters"
+             x:Class="Musilib.Desktop.Views.QueueView"
+             x:DataType="vm:QueueViewModel">
+  <UserControl.Resources>
+    <DataTemplate x:Key="JobTemplate" x:DataType="vm:JobViewModel">
+      <Border Classes="card tight" Margin="0,0,8,10">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <Border Classes="chip" Classes.accent="{Binding IsRunning}" Margin="0,0,16,0" VerticalAlignment="Top">
+            <c:LineIcon Data="{Binding IconKey, Converter={x:Static conv:IconKeyConverter.Instance}}" />
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="5">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel>
+                <TextBlock Text="{Binding Title}" Classes="h3" />
+                <TextBlock Classes="small subtle">
+                  <Run Text="{Binding TypeText}" />
+                  <Run Text=" · " />
+                  <Run Text="{Binding TimesText}" />
+                </TextBlock>
+              </StackPanel>
+              <Border Grid.Column="1" Classes="badge" Classes.success="{Binding Badge.IsSuccess}" Classes.warning="{Binding Badge.IsWarning}"
+                      Classes.danger="{Binding Badge.IsDanger}" Classes.info="{Binding Badge.IsInfo}" Classes.accent="{Binding Badge.IsAccent}" VerticalAlignment="Top">
+                <TextBlock Text="{Binding Badge.Text}" />
+              </Border>
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+              <ProgressBar Value="{Binding Progress}" Maximum="100" IsIndeterminate="{Binding IsIndeterminate}" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{Binding ProgressText}" Classes="small muted" Margin="12,0,0,0" MinWidth="70" TextAlignment="Right" />
+            </Grid>
+            <TextBlock Text="{Binding CurrentItem}" Classes="small subtle" IsVisible="{Binding HasCurrentItem}" />
+            <TextBlock Text="{Binding FailedText}" Classes="small danger" IsVisible="{Binding HasFailed}" />
+            <TextBlock Text="{Binding Message}" Classes="small muted wrap" IsVisible="{Binding HasMessage}" />
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2" VerticalAlignment="Top" Margin="12,0,0,0">
+            <Button Classes="icon" Command="{Binding PauseCommand}" IsVisible="{Binding CanPause}" ToolTip.Tip="Mettre en pause">
+              <c:LineIcon Data="{StaticResource Icon.Pause}" Classes="small" />
+            </Button>
+            <Button Classes="icon" Command="{Binding ResumeCommand}" IsVisible="{Binding CanResume}" ToolTip.Tip="Reprendre">
+              <c:LineIcon Data="{StaticResource Icon.Play}" Classes="small" />
+            </Button>
+            <Button Classes="icon" Command="{Binding CancelCommand}" IsVisible="{Binding CanCancel}" ToolTip.Tip="Annuler">
+              <c:LineIcon Data="{StaticResource Icon.XCircle}" Classes="small" />
+            </Button>
+            <Button Classes="icon" Command="{Binding RemoveCommand}" ToolTip.Tip="Retirer de la liste">
+              <c:LineIcon Data="{StaticResource Icon.Trash}" Classes="small" />
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <ScrollViewer Classes="page">
+    <StackPanel Spacing="18" Margin="0,0,0,12">
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Progression globale" Classes="h2" />
+            <ProgressBar Value="{Binding GlobalProgress}" Maximum="100" Height="8" MinHeight="8" CornerRadius="4" />
+            <TextBlock Text="{Binding GlobalText}" Classes="small muted" />
+            <TextBlock Text="{Binding ConcurrencyText}" Classes="small subtle" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" Margin="20,0,0,0">
+            <Button Classes="outline small" Content="Tout mettre en pause" Command="{Binding PauseAllCommand}" />
+            <Button Classes="outline small" Content="Tout reprendre" Command="{Binding ResumeAllCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <TextBlock Text="En cours et en attente" Classes="h2" />
+      <Border Classes="card" IsVisible="{Binding HasNoActive}">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <c:LineIcon Data="{StaticResource Icon.CheckCircle}" Foreground="{DynamicResource SuccessBrush}" />
+          <TextBlock Text="Aucun traitement actif. Les traitements interrompus (fermeture, coupure réseau) reprennent automatiquement au démarrage." Classes="muted wrap" VerticalAlignment="Center" />
+        </StackPanel>
+      </Border>
+      <ItemsControl ItemsSource="{Binding Active}" ItemTemplate="{StaticResource JobTemplate}" />
+
+      <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasFinished}">
+        <TextBlock Text="Terminés" Classes="h2" />
+        <Button Grid.Column="1" Classes="ghost small" Content="Effacer les terminés" Command="{Binding ClearFinishedCommand}" />
+      </Grid>
+      <ItemsControl ItemsSource="{Binding Finished}" ItemTemplate="{StaticResource JobTemplate}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,31 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Musilib.Desktop.App"
+             Name="Musilib Manager"
+             RequestedThemeVariant="Dark">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://MusilibManager/Styles/Theme.axaml" />
+        <ResourceInclude Source="avares://MusilibManager/Styles/Icons.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Dark" Accent="#FF1ED760" AltHigh="#FF0E0F13" AltLow="#FF0E0F13" AltMedium="#FF0E0F13"
+                               AltMediumHigh="#FF0E0F13" AltMediumLow="#FF0E0F13" BaseHigh="#FFEEF0F4" BaseLow="#FF262A33"
+                               BaseMedium="#FFA3A9B6" BaseMediumHigh="#FFC9CDD6" BaseMediumLow="#FF6C7280" ChromeAltLow="#FFC9CDD6"
+                               ChromeBlackHigh="#FF000000" ChromeBlackLow="#FFC9CDD6" ChromeBlackMedium="#FF000000"
+                               ChromeBlackMediumLow="#FF000000" ChromeDisabledHigh="#FF262A33" ChromeDisabledLow="#FF6C7280"
+                               ChromeGray="#FF8B92A0" ChromeHigh="#FF8B92A0" ChromeLow="#FF15171C" ChromeMedium="#FF1D2027"
+                               ChromeMediumLow="#FF252932" ChromeWhite="#FFFFFFFF" ListLow="#FF1D2027" ListMedium="#FF262A33"
+                               RegionColor="#FF0E0F13" />
+        <ColorPaletteResources x:Key="Light" Accent="#FF14A84B" RegionColor="#FFF4F5F8" />
+      </FluentTheme.Palettes>
+    </FluentTheme>
+    <StyleInclude Source="avares://MusilibManager/Styles/Controls.axaml" />
+  </Application.Styles>
+</Application>

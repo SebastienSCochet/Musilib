@@ -1,0 +1,92 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.ThemeDictionaries>
+    <!-- Thème sombre (par défaut) -->
+    <ResourceDictionary x:Key="Dark">
+      <Color x:Key="AccentColor">#FF1ED760</Color>
+      <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FF0E0F13" />
+      <SolidColorBrush x:Key="SidebarBrush" Color="#FF08090C" />
+      <SolidColorBrush x:Key="SurfaceBrush" Color="#FF15171C" />
+      <SolidColorBrush x:Key="SurfaceAltBrush" Color="#FF1D2027" />
+      <SolidColorBrush x:Key="SurfaceHoverBrush" Color="#FF252932" />
+      <SolidColorBrush x:Key="CardBrush" Color="#FF16181E" />
+      <SolidColorBrush x:Key="CardHoverBrush" Color="#FF1C1F26" />
+      <SolidColorBrush x:Key="StrokeBrush" Color="#FF262A33" />
+      <SolidColorBrush x:Key="StrokeStrongBrush" Color="#FF363B46" />
+      <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFEEF0F4" />
+      <SolidColorBrush x:Key="TextSecondaryBrush" Color="#FFA3A9B6" />
+      <SolidColorBrush x:Key="TextTertiaryBrush" Color="#FF6C7280" />
+      <SolidColorBrush x:Key="AccentBrush" Color="#FF1ED760" />
+      <SolidColorBrush x:Key="AccentHoverBrush" Color="#FF3BE477" />
+      <SolidColorBrush x:Key="AccentPressedBrush" Color="#FF17B34F" />
+      <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FF07140C" />
+      <SolidColorBrush x:Key="AccentSoftBrush" Color="#261ED760" />
+      <SolidColorBrush x:Key="SuccessBrush" Color="#FF35D07F" />
+      <SolidColorBrush x:Key="SuccessSoftBrush" Color="#2235D07F" />
+      <SolidColorBrush x:Key="WarningBrush" Color="#FFF5B14C" />
+      <SolidColorBrush x:Key="WarningSoftBrush" Color="#22F5B14C" />
+      <SolidColorBrush x:Key="DangerBrush" Color="#FFF2606F" />
+      <SolidColorBrush x:Key="DangerSoftBrush" Color="#22F2606F" />
+      <SolidColorBrush x:Key="InfoBrush" Color="#FF5AA9FF" />
+      <SolidColorBrush x:Key="InfoSoftBrush" Color="#225AA9FF" />
+      <SolidColorBrush x:Key="PurpleBrush" Color="#FFA58BFF" />
+      <SolidColorBrush x:Key="PurpleSoftBrush" Color="#22A58BFF" />
+      <SolidColorBrush x:Key="MutedSoftBrush" Color="#18A3A9B6" />
+      <SolidColorBrush x:Key="YouTubeBrush" Color="#FFFF4E45" />
+      <SolidColorBrush x:Key="YouTubeSoftBrush" Color="#22FF4E45" />
+      <SolidColorBrush x:Key="SpotifyBrush" Color="#FF1ED760" />
+      <SolidColorBrush x:Key="OverlayBrush" Color="#B3050608" />
+      <LinearGradientBrush x:Key="HeroGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Offset="0" Color="#FF153A27" />
+        <GradientStop Offset="0.55" Color="#FF14191F" />
+        <GradientStop Offset="1" Color="#FF0E0F13" />
+      </LinearGradientBrush>
+    </ResourceDictionary>
+
+    <!-- Thème clair -->
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="AccentColor">#FF14A84B</Color>
+      <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FFF4F5F8" />
+      <SolidColorBrush x:Key="SidebarBrush" Color="#FFFFFFFF" />
+      <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFFFF" />
+      <SolidColorBrush x:Key="SurfaceAltBrush" Color="#FFEDEFF3" />
+      <SolidColorBrush x:Key="SurfaceHoverBrush" Color="#FFE3E6EC" />
+      <SolidColorBrush x:Key="CardBrush" Color="#FFFFFFFF" />
+      <SolidColorBrush x:Key="CardHoverBrush" Color="#FFF9FAFB" />
+      <SolidColorBrush x:Key="StrokeBrush" Color="#FFE2E5EB" />
+      <SolidColorBrush x:Key="StrokeStrongBrush" Color="#FFCDD2DA" />
+      <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FF14161B" />
+      <SolidColorBrush x:Key="TextSecondaryBrush" Color="#FF5B6270" />
+      <SolidColorBrush x:Key="TextTertiaryBrush" Color="#FF8B92A0" />
+      <SolidColorBrush x:Key="AccentBrush" Color="#FF14A84B" />
+      <SolidColorBrush x:Key="AccentHoverBrush" Color="#FF119141" />
+      <SolidColorBrush x:Key="AccentPressedBrush" Color="#FF0E7C37" />
+      <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFFFF" />
+      <SolidColorBrush x:Key="AccentSoftBrush" Color="#1F14A84B" />
+      <SolidColorBrush x:Key="SuccessBrush" Color="#FF16924F" />
+      <SolidColorBrush x:Key="SuccessSoftBrush" Color="#1F16924F" />
+      <SolidColorBrush x:Key="WarningBrush" Color="#FFB86E00" />
+      <SolidColorBrush x:Key="WarningSoftBrush" Color="#22E39B2B" />
+      <SolidColorBrush x:Key="DangerBrush" Color="#FFD43347" />
+      <SolidColorBrush x:Key="DangerSoftBrush" Color="#1FD43347" />
+      <SolidColorBrush x:Key="InfoBrush" Color="#FF2370D6" />
+      <SolidColorBrush x:Key="InfoSoftBrush" Color="#1F2370D6" />
+      <SolidColorBrush x:Key="PurpleBrush" Color="#FF6F4FE0" />
+      <SolidColorBrush x:Key="PurpleSoftBrush" Color="#1F6F4FE0" />
+      <SolidColorBrush x:Key="MutedSoftBrush" Color="#145B6270" />
+      <SolidColorBrush x:Key="YouTubeBrush" Color="#FFE62117" />
+      <SolidColorBrush x:Key="YouTubeSoftBrush" Color="#1FE62117" />
+      <SolidColorBrush x:Key="SpotifyBrush" Color="#FF14A84B" />
+      <SolidColorBrush x:Key="OverlayBrush" Color="#8C0E1014" />
+      <LinearGradientBrush x:Key="HeroGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Offset="0" Color="#FFD9F5E4" />
+        <GradientStop Offset="0.6" Color="#FFF4F5F8" />
+        <GradientStop Offset="1" Color="#FFF4F5F8" />
+      </LinearGradientBrush>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <CornerRadius x:Key="CardRadius">14</CornerRadius>
+  <CornerRadius x:Key="PillRadius">999</CornerRadius>
+  <CornerRadius x:Key="ControlRadius">10</CornerRadius>
+</ResourceDictionary>

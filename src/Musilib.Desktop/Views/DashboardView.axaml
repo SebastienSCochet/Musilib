@@ -1,0 +1,177 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Musilib.Desktop.ViewModels"
+             xmlns:c="using:Musilib.Desktop.Controls"
+             xmlns:conv="using:Musilib.Desktop.Converters"
+             x:Class="Musilib.Desktop.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+  <ScrollViewer Classes="page">
+    <StackPanel Spacing="26" Margin="0,0,8,12">
+
+      <!-- Bandeau d'accueil -->
+      <Border Classes="hero">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="8">
+            <TextBlock Text="{Binding Greeting}" Classes="display" />
+            <TextBlock Text="{Binding Summary}" Classes="muted body wrap" MaxWidth="640" HorizontalAlignment="Left" />
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,14,0,0">
+              <Button Classes="primary" Command="{Binding GoLibraryCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <c:LineIcon Data="{StaticResource Icon.Plus}" Classes="small" />
+                  <TextBlock Text="Importer une playlist" />
+                </StackPanel>
+              </Button>
+              <Button Classes="outline" Command="{Binding GoReviewCommand}" IsVisible="{Binding HasReview}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <c:LineIcon Data="{StaticResource Icon.Compare}" Classes="small" Foreground="{DynamicResource WarningBrush}" />
+                  <TextBlock Text="{Binding ReviewCount, StringFormat='Vérifier {0} correspondance(s)'}" />
+                </StackPanel>
+              </Button>
+              <Button Classes="ghost" Command="{Binding GoConnectionsCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <c:LineIcon Data="{StaticResource Icon.Link}" Classes="small" />
+                  <TextBlock Text="Connexions" />
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </StackPanel>
+          <c:LineIcon Grid.Column="1" Data="{StaticResource Icon.Disc}" Width="110" Height="110" StrokeThickness="1"
+                      Foreground="{DynamicResource AccentBrush}" Opacity="0.35" VerticalAlignment="Center" Margin="0,0,20,0" />
+        </Grid>
+      </Border>
+
+      <Border Classes="notice" IsVisible="{Binding IsDemo}">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <c:LineIcon Data="{StaticResource Icon.Info}" Foreground="{DynamicResource InfoBrush}" />
+          <TextBlock Classes="wrap small" VerticalAlignment="Center"
+                     Text="Mode démonstration : les playlists, artistes et titres sont fictifs, aucune donnée n'est envoyée à YouTube ou Spotify. Désactivez-le dans les Paramètres pour utiliser vos comptes." />
+        </StackPanel>
+      </Border>
+
+      <!-- Statistiques -->
+      <ItemsControl ItemsSource="{Binding Stats}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid Columns="3" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:StatCard">
+            <Border Classes="card" Margin="0,0,14,14">
+              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+                <Border Classes="chip" Classes.accent="{Binding IsAccent}" Classes.warning="{Binding IsWarning}" Classes.info="{Binding IsInfo}"
+                        Classes.purple="{Binding IsPurple}" Classes.danger="{Binding IsDanger}" Grid.RowSpan="3" VerticalAlignment="Top" Margin="0,0,16,0">
+                  <c:LineIcon Data="{Binding IconKey, Converter={x:Static conv:IconKeyConverter.Instance}}" />
+                </Border>
+                <TextBlock Grid.Column="1" Text="{Binding Label}" Classes="small muted" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Value}" Classes="stat" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Hint}" Classes="small subtle" />
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <Grid ColumnDefinitions="3*,2*" Margin="0,-12,0,0">
+        <!-- Playlists récentes -->
+        <StackPanel Spacing="12" Margin="0,0,14,0">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Playlists récentes" Classes="h2" />
+            <Button Grid.Column="1" Classes="link" Content="Tout afficher" Command="{Binding GoLibraryCommand}" />
+          </Grid>
+          <Border Classes="card" IsVisible="{Binding !HasPlaylists}">
+            <StackPanel Spacing="10" HorizontalAlignment="Center" Margin="0,24">
+              <c:LineIcon Data="{StaticResource Icon.Music}" Classes="huge" Foreground="{DynamicResource TextTertiaryBrush}" HorizontalAlignment="Center" />
+              <TextBlock Text="Aucune playlist importée" Classes="h3" HorizontalAlignment="Center" />
+              <TextBlock Text="Importez une playlist YouTube depuis la bibliothèque." Classes="muted" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Border>
+          <ItemsControl ItemsSource="{Binding RecentPlaylists}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <UniformGrid Columns="2" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:PlaylistCardViewModel">
+                <Button Command="{Binding OpenCommand}" Classes="bare" Margin="0,0,12,12">
+                  <Border Classes="card interactive tight">
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                      <c:CoverArt Source="{Binding Cover}" FallbackText="{Binding Title}" Width="64" Height="64" CornerRadius="10" Margin="0,0,14,0" Grid.RowSpan="2" />
+                      <StackPanel Grid.Column="1" Spacing="3">
+                        <TextBlock Text="{Binding Title}" Classes="h3" />
+                        <TextBlock Text="{Binding Subtitle}" Classes="small muted" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Grid.Row="1" Spacing="6" Margin="0,10,0,0">
+                        <c:MeterBar Fill="{DynamicResource AccentBrush}" Value="{Binding MatchedPercent}" Maximum="100" Track="{DynamicResource SurfaceHoverBrush}" />
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Text="{Binding MatchedText}" Classes="small subtle" />
+                          <Border Grid.Column="1" Classes="badge warning" IsVisible="{Binding HasReview}">
+                            <TextBlock Text="{Binding ReviewText}" />
+                          </Border>
+                        </Grid>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- Traitements et activité -->
+        <StackPanel Grid.Column="1" Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Derniers traitements" Classes="h2" />
+            <Button Grid.Column="1" Classes="link" Content="File d'attente" Command="{Binding GoQueueCommand}" />
+          </Grid>
+          <Border Classes="card tight">
+            <StackPanel>
+              <TextBlock Text="Aucun traitement pour le moment." Classes="muted small" Margin="6"
+                         IsVisible="{Binding HasNoJobs}" />
+              <ItemsControl ItemsSource="{Binding RecentJobs}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:JobViewModel">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" Margin="4,7">
+                      <Border Classes="chip small" Grid.RowSpan="2" Margin="0,0,12,0" VerticalAlignment="Top">
+                        <c:LineIcon Data="{Binding IconKey, Converter={x:Static conv:IconKeyConverter.Instance}}" Classes="small" />
+                      </Border>
+                      <TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="SemiBold" />
+                      <Border Grid.Column="2" Classes="badge" Classes.success="{Binding Badge.IsSuccess}" Classes.warning="{Binding Badge.IsWarning}"
+                              Classes.danger="{Binding Badge.IsDanger}" Classes.info="{Binding Badge.IsInfo}" Classes.accent="{Binding Badge.IsAccent}">
+                        <TextBlock Text="{Binding Badge.Text}" />
+                      </Border>
+                      <TextBlock Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Text="{Binding TimesText}" Classes="small subtle" Margin="0,2,0,0" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+            <TextBlock Text="Activité récente" Classes="h2" />
+            <Button Grid.Column="1" Classes="link" Content="Historique" Command="{Binding GoHistoryCommand}" />
+          </Grid>
+          <Border Classes="card tight">
+            <ItemsControl ItemsSource="{Binding RecentHistory}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:HistoryLine">
+                  <Grid ColumnDefinitions="Auto,*,Auto" Margin="4,6">
+                    <c:LineIcon Data="{Binding IconKey, Converter={x:Static conv:IconKeyConverter.Instance}}" Classes="small"
+                                Foreground="{DynamicResource TextTertiaryBrush}" Margin="0,2,12,0" VerticalAlignment="Top" />
+                    <StackPanel Grid.Column="1">
+                      <TextBlock Text="{Binding Title}" Classes="small" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Details}" Classes="small subtle" IsVisible="{Binding HasDetails}" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="{Binding When}" Classes="small subtle" Margin="8,0,0,0" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Border>
+        </StackPanel>
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

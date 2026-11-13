@@ -1,0 +1,164 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Musilib.Desktop.ViewModels"
+             xmlns:c="using:Musilib.Desktop.Controls"
+             x:Class="Musilib.Desktop.Views.PlaylistView"
+             x:DataType="vm:PlaylistViewModel">
+  <Panel>
+    <!-- Aucune playlist -->
+    <Border Classes="card" IsVisible="{Binding HasNoPlaylist}" VerticalAlignment="Top">
+      <StackPanel Spacing="10" HorizontalAlignment="Center" Margin="0,48">
+        <c:LineIcon Data="{StaticResource Icon.List}" Classes="huge" Foreground="{DynamicResource TextTertiaryBrush}" HorizontalAlignment="Center" />
+        <TextBlock Text="Aucune playlist sélectionnée" Classes="h3" HorizontalAlignment="Center" />
+        <TextBlock Text="Importez une playlist depuis la bibliothèque pour l'analyser." Classes="muted" HorizontalAlignment="Center" />
+        <Button Classes="primary" Content="Aller à la bibliothèque" Command="{Binding GoLibraryCommand}" HorizontalAlignment="Center" Margin="0,8,0,0" />
+      </StackPanel>
+    </Border>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" IsVisible="{Binding HasPlaylist}">
+      <!-- En-tête de playlist -->
+      <Border Classes="hero" Padding="22,20">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <c:CoverArt Source="{Binding Playlist.ThumbnailUrl, FallbackValue={x:Null}}" FallbackText="{Binding Header}" Width="112" Height="112" CornerRadius="12"
+                      BoxShadow="0 10 30 0 #55000000" Margin="0,0,22,0" DecodeWidth="320" />
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
+            <TextBlock Text="PLAYLIST YOUTUBE" Classes="caption" />
+            <TextBlock Text="{Binding Header}" Classes="display" />
+            <TextBlock Text="{Binding SubHeader}" Classes="muted" />
+            <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+              <ProgressBar Value="{Binding MatchedPercent}" Maximum="100" Width="260" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding MatchedText}" Classes="small muted" VerticalAlignment="Center" />
+            </StackPanel>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Spacing="8" VerticalAlignment="Center">
+            <Button Classes="primary" Command="{Binding AnalyzeCommand}" HorizontalAlignment="Stretch">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <c:LineIcon Data="{StaticResource Icon.Sparkle}" Classes="small" />
+                <TextBlock Text="Rechercher sur Spotify" />
+              </StackPanel>
+            </Button>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Classes="outline small" Command="{Binding SyncCommand}" ToolTip.Tip="Réimporter depuis YouTube (les modifications sont conservées)">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:LineIcon Data="{StaticResource Icon.Refresh}" Classes="small" />
+                  <TextBlock Text="Synchroniser" />
+                </StackPanel>
+              </Button>
+              <Button Classes="outline small" Content="Tout réanalyser" Command="{Binding ReanalyzeAllCommand}" />
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- Traitement en cours -->
+      <Border Grid.Row="1" Classes="card tight" Margin="0,14,0,0" IsVisible="{Binding HasActiveJob}">
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+          <c:LineIcon Data="{StaticResource Icon.Refresh}" Classes="spin" Foreground="{DynamicResource AccentBrush}" Margin="4,0,14,0" />
+          <StackPanel Grid.Column="1" Spacing="6">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{Binding ActiveJob.Title, FallbackValue=''}" FontWeight="SemiBold" />
+              <TextBlock Grid.Column="1" Text="{Binding ActiveJob.ProgressText, FallbackValue=''}" Classes="small muted" />
+            </Grid>
+            <ProgressBar Value="{Binding ActiveJob.Progress, FallbackValue=0}" Maximum="100" IsIndeterminate="{Binding ActiveJob.IsIndeterminate, FallbackValue=False}" />
+            <TextBlock Text="{Binding ActiveJob.CurrentItem, FallbackValue=''}" Classes="small subtle" />
+          </StackPanel>
+          <Button Grid.Column="2" Classes="ghost small" Content="Pause" Command="{Binding ActiveJob.PauseCommand, FallbackValue={x:Null}}" Margin="12,0,0,0" />
+          <Button Grid.Column="3" Classes="ghost small" Content="Annuler" Command="{Binding ActiveJob.CancelCommand, FallbackValue={x:Null}}" />
+        </Grid>
+      </Border>
+
+      <!-- Filtres -->
+      <Grid Grid.Row="2" ColumnDefinitions="*,280" Margin="0,18,0,10">
+        <WrapPanel>
+          <RadioButton Classes="segment" GroupName="pf" IsChecked="True" Command="{Binding SetFilterCommand}" CommandParameter="all">
+            <TextBlock Text="{Binding CountAll, StringFormat='Tous · {0}'}" />
+          </RadioButton>
+          <RadioButton Classes="segment" GroupName="pf" Command="{Binding SetFilterCommand}" CommandParameter="review">
+            <TextBlock Text="{Binding CountReview, StringFormat='À vérifier · {0}'}" />
+          </RadioButton>
+          <RadioButton Classes="segment" GroupName="pf" Command="{Binding SetFilterCommand}" CommandParameter="matched">
+            <TextBlock Text="{Binding CountMatched, StringFormat='Associés · {0}'}" />
+          </RadioButton>
+          <RadioButton Classes="segment" GroupName="pf" Command="{Binding SetFilterCommand}" CommandParameter="missing">
+            <TextBlock Text="{Binding CountMissing, StringFormat='Introuvables · {0}'}" />
+          </RadioButton>
+          <RadioButton Classes="segment" GroupName="pf" Command="{Binding SetFilterCommand}" CommandParameter="pending">
+            <TextBlock Text="{Binding CountPending, StringFormat='En attente · {0}'}" />
+          </RadioButton>
+          <RadioButton Classes="segment" GroupName="pf" Command="{Binding SetFilterCommand}" CommandParameter="unavailable">
+            <TextBlock Text="{Binding CountUnavailable, StringFormat='Indisponibles · {0}'}" />
+          </RadioButton>
+          <RadioButton Classes="segment" GroupName="pf" Command="{Binding SetFilterCommand}" CommandParameter="excluded">
+            <TextBlock Text="{Binding CountExcluded, StringFormat='Exclus · {0}'}" />
+          </RadioButton>
+        </WrapPanel>
+        <Panel Grid.Column="1">
+          <TextBox Classes="search" Text="{Binding Search}" Watermark="Rechercher un titre, un artiste…" />
+          <c:LineIcon Data="{StaticResource Icon.Search}" Classes="small" Foreground="{DynamicResource TextTertiaryBrush}" HorizontalAlignment="Left" Margin="14,0,0,0" IsHitTestVisible="False" />
+        </Panel>
+      </Grid>
+
+      <!-- En-têtes de colonnes -->
+      <Grid Grid.Row="3" Classes="tablehead" ColumnDefinitions="44,52,3*,2*,70,120,90,150" Margin="10,0,18,6">
+        <TextBlock Text="#" HorizontalAlignment="Center" />
+        <TextBlock Grid.Column="2" Text="TITRE" />
+        <TextBlock Grid.Column="3" Text="SOURCE YOUTUBE" />
+        <TextBlock Grid.Column="4" Text="DURÉE" />
+        <TextBlock Grid.Column="5" Text="STATUT" />
+        <TextBlock Grid.Column="6" Text="SCORE" />
+      </Grid>
+
+      <!-- Liste des morceaux -->
+      <Border Grid.Row="4" Classes="card flush" Padding="4">
+        <Panel>
+          <TextBlock Text="Aucun morceau ne correspond à ce filtre." Classes="muted" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsEmptyResult}" />
+          <ListBox Classes="rows" ItemsSource="{Binding Rows}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:TrackRowViewModel">
+                <Grid ColumnDefinitions="44,52,3*,2*,70,120,90,150" Height="52" Background="Transparent">
+                  <TextBlock Text="{Binding Number}" Classes="muted small" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  <c:CoverArt Grid.Column="1" Source="{Binding Cover}" FallbackText="{Binding FallbackText}" Width="42" Height="42" CornerRadius="6" DecodeWidth="96" Classes.dim="{Binding IsExcluded}" />
+                  <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="12,0,12,0">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" ToolTip.Tip="{Binding Title}" />
+                      <c:LineIcon Grid.Column="1" Data="{StaticResource Icon.Edit}" Width="12" Height="12" Margin="6,0,0,0" Foreground="{DynamicResource InfoBrush}" IsVisible="{Binding IsEdited}" ToolTip.Tip="Métadonnées modifiées manuellement" />
+                      <c:LineIcon Grid.Column="2" Data="{StaticResource Icon.File}" Width="12" Height="12" Margin="6,0,0,0" Foreground="{DynamicResource PurpleBrush}" IsVisible="{Binding HasLocalFile}" ToolTip.Tip="Fichier audio local associé" />
+                    </Grid>
+                    <TextBlock Text="{Binding Artists}" Classes="small muted" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <TextBlock Text="{Binding SourceTitle}" Classes="small muted" ToolTip.Tip="{Binding SourceLine}" />
+                    <TextBlock Text="{Binding Error}" Classes="small warning" IsVisible="{Binding HasError}" />
+                  </StackPanel>
+                  <TextBlock Grid.Column="4" Text="{Binding Duration}" Classes="small muted" VerticalAlignment="Center" />
+                  <Border Grid.Column="5" Classes="badge" Classes.success="{Binding Badge.IsSuccess}" Classes.warning="{Binding Badge.IsWarning}"
+                          Classes.danger="{Binding Badge.IsDanger}" Classes.info="{Binding Badge.IsInfo}" Classes.accent="{Binding Badge.IsAccent}">
+                    <TextBlock Text="{Binding Badge.Text}" />
+                  </Border>
+                  <StackPanel Grid.Column="6" VerticalAlignment="Center" Spacing="4" Margin="0,0,10,0" IsVisible="{Binding HasScore}">
+                    <TextBlock Text="{Binding ScoreText}" Classes="small" />
+                    <c:MeterBar Fill="{DynamicResource AccentBrush}" Value="{Binding ScorePercent}" Maximum="100" Track="{DynamicResource SurfaceHoverBrush}" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="7" Orientation="Horizontal" Spacing="2" HorizontalAlignment="Right">
+                    <Button Classes="icon" Command="{Binding CompareCommand}" ToolTip.Tip="Comparer les correspondances">
+                      <c:LineIcon Data="{StaticResource Icon.Compare}" Classes="small" />
+                    </Button>
+                    <Button Classes="icon" Command="{Binding EditCommand}" ToolTip.Tip="Éditer les métadonnées">
+                      <c:LineIcon Data="{StaticResource Icon.Edit}" Classes="small" />
+                    </Button>
+                    <Button Classes="icon" Command="{Binding ToggleExcludeCommand}" ToolTip.Tip="{Binding ExcludeLabel}">
+                      <Panel>
+                        <c:LineIcon Data="{StaticResource Icon.EyeOff}" Classes="small" IsVisible="{Binding !IsExcluded}" />
+                        <c:LineIcon Data="{StaticResource Icon.Eye}" Classes="small" IsVisible="{Binding IsExcluded}" />
+                      </Panel>
+                    </Button>
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Panel>
+      </Border>
+    </Grid>
+  </Panel>
+</UserControl>
