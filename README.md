@@ -273,3 +273,11 @@ scripts/
   publish.ps1 / publish.cmd
 docs/screenshots/
 ```
+
+## Pistes d'amélioration
+
+- Publier des versions binaires signées via GitHub Releases, générées par la CI.
+- Ajouter le support macOS et Linux (Avalonia le permet ; le lecteur audio NAudio est spécifique à Windows).
+- Étendre les tests à la couche Desktop (ViewModels) en plus des tests d'application, de domaine et d'infrastructure.
+- Ajouter d'autres sources et destinations de playlists (Deezer, Apple Music) derrière les mêmes abstractions.
+- Mettre à jour les captures d'écran à chaque version.
